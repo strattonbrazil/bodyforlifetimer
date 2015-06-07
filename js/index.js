@@ -4,7 +4,7 @@
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   BodyForLifeTimerViewModel = (function() {
-    var TWENTY_MINUTES_IN_SECONDS, intervalIntensities;
+    var ADD_SUB_SECONDS, TWENTY_MINUTES_IN_SECONDS, intervalIntensities;
 
     TWENTY_MINUTES_IN_SECONDS = 1200;
 
@@ -17,6 +17,7 @@
       this.timerText = ko.computed(this._timerText, this);
       this.intensityText = ko.computed(this._intensityText, this);
       this.intensityGraph = ko.computed(this._intensityGraph, this);
+      this.soundEnabled = ko.observable(true);
       this._secondIntervalHandle = setInterval(this._tick, 1000);
     }
 
@@ -39,6 +40,9 @@
     BodyForLifeTimerViewModel.prototype.toggleTimer = function(vm, event) {
       var going;
       going = this.timerGoing();
+      if (!going) {
+        this._playIntervalChangeSound();
+      }
       return this.timerGoing(!going);
     };
 
@@ -83,27 +87,39 @@
     };
 
     BodyForLifeTimerViewModel.prototype._tick = function() {
+      var prevTime;
       if (this.timerGoing()) {
-        this.timerCount(this.timerCount() - 1);
-        if (this.timerCount() % 60 === 0) {
+        prevTime = this.timerCount();
+        this.timerCount(Math.max(0, this.timerCount() - 1));
+        if (this.timerCount() % 60 === 0 && prevTime !== this.timerCount()) {
           return this._playIntervalChangeSound();
         }
       }
     };
 
+    ADD_SUB_SECONDS = 15;
+
     BodyForLifeTimerViewModel.prototype.addTime = function() {
       var newCount;
-      newCount = Math.min(TWENTY_MINUTES_IN_SECONDS, this.timerCount() + 30);
+      newCount = Math.min(TWENTY_MINUTES_IN_SECONDS, this.timerCount() + ADD_SUB_SECONDS);
       return this.timerCount(newCount);
     };
 
     BodyForLifeTimerViewModel.prototype.subtractTime = function() {
       var newCount;
-      newCount = Math.max(0, this.timerCount() - 30);
+      newCount = Math.max(0, this.timerCount() - ADD_SUB_SECONDS);
       return this.timerCount(newCount);
     };
 
-    BodyForLifeTimerViewModel.prototype._playIntervalChangeSound = function() {};
+    BodyForLifeTimerViewModel.prototype._playIntervalChangeSound = function() {
+      var audioElement, soundFile;
+      if (this.soundEnabled()) {
+        audioElement = document.getElementById("audio");
+        soundFile = "sounds/" + (this._intensityText()) + ".wav";
+        audioElement.src = soundFile;
+        return audioElement.play();
+      }
+    };
 
     return BodyForLifeTimerViewModel;
 

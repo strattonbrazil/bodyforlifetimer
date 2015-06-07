@@ -20,7 +20,8 @@
            <a href="#" class="button tiny control-button fi-minus" data-bind="click: subtractTime"> Subtract Time</a>
            <div data-bind="html: intensityGraph"></div>
            <div>
-               <!-- <input type="checkbox">Sound Enabled</input> -->
+               <input type="checkbox" data-bind="checked: soundEnabled">Sound Enabled</input>
+               <audio id="audio"></audio>
            </div>
        </div>
      </div>

@@ -9,6 +9,7 @@ class BodyForLifeTimerViewModel
         @timerText = ko.computed(@_timerText, @)
         @intensityText = ko.computed(@_intensityText, @)
         @intensityGraph = ko.computed(@_intensityGraph, @)
+        @soundEnabled = ko.observable(true)
 
         @_secondIntervalHandle = setInterval(@_tick, 1000)
 
@@ -27,6 +28,9 @@ class BodyForLifeTimerViewModel
 
     toggleTimer: (vm, event) ->
         going = @timerGoing()
+
+        if not going
+            @_playIntervalChangeSound()
 
         # toggle it
         @timerGoing(not going)
@@ -98,22 +102,31 @@ class BodyForLifeTimerViewModel
     # called every second
     _tick: =>
         if @timerGoing()
-            @timerCount(@timerCount()-1)
+            prevTime = @timerCount()
+            @timerCount(Math.max(0, @timerCount()-1))
 
-            # new interval
-            if @timerCount() % 60 is 0
+            # new interval, play sound if actually changed
+            if @timerCount() % 60 is 0 and prevTime isnt @timerCount()
                 @_playIntervalChangeSound()
 
+    ADD_SUB_SECONDS = 15
+
     addTime: ->
-        newCount = Math.min(TWENTY_MINUTES_IN_SECONDS, @timerCount() + 30)
+        newCount = Math.min(TWENTY_MINUTES_IN_SECONDS, @timerCount() + ADD_SUB_SECONDS)
         @timerCount(newCount)
 
     subtractTime: ->
-        newCount = Math.max(0, @timerCount() - 30)
+        newCount = Math.max(0, @timerCount() - ADD_SUB_SECONDS)
         @timerCount(newCount)
 
     # play a sound when going between interval intensities
     _playIntervalChangeSound: ->
+        if @soundEnabled()
+            audioElement = document.getElementById("audio");
+            soundFile = "sounds/#{@_intensityText()}.wav"
+
+            audioElement.src = soundFile
+            audioElement.play()
         
 $(document).ready(->
     timerVM = new BodyForLifeTimerViewModel()
