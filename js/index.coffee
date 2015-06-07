@@ -86,6 +86,11 @@ class BodyForLifeTimerViewModel
 
     _intensityGraph: ->
         backwards = intervalIntensities.slice(0)
+
+        for i in [0..backwards.length-1]
+            if i is @_interval() or i is 20
+                backwards[i] = '<b><u>' + backwards[i] + '</u></b>'
+
         backwards.reverse()
 
         return backwards.join(' ')
@@ -100,11 +105,11 @@ class BodyForLifeTimerViewModel
                 @_playIntervalChangeSound()
 
     addTime: ->
-        newCount = Math.min(TWENTY_MINUTES_IN_SECONDS, @timerCount() + 10)
+        newCount = Math.min(TWENTY_MINUTES_IN_SECONDS, @timerCount() + 30)
         @timerCount(newCount)
 
     subtractTime: ->
-        newCount = Math.max(0, @timerCount() - 10)
+        newCount = Math.max(0, @timerCount() - 30)
         @timerCount(newCount)
 
     # play a sound when going between interval intensities

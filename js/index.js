@@ -71,8 +71,13 @@
     };
 
     BodyForLifeTimerViewModel.prototype._intensityGraph = function() {
-      var backwards;
+      var backwards, i, _i, _ref;
       backwards = intervalIntensities.slice(0);
+      for (i = _i = 0, _ref = backwards.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+        if (i === this._interval() || i === 20) {
+          backwards[i] = '<b><u>' + backwards[i] + '</u></b>';
+        }
+      }
       backwards.reverse();
       return backwards.join(' ');
     };
@@ -88,13 +93,13 @@
 
     BodyForLifeTimerViewModel.prototype.addTime = function() {
       var newCount;
-      newCount = Math.min(TWENTY_MINUTES_IN_SECONDS, this.timerCount() + 10);
+      newCount = Math.min(TWENTY_MINUTES_IN_SECONDS, this.timerCount() + 30);
       return this.timerCount(newCount);
     };
 
     BodyForLifeTimerViewModel.prototype.subtractTime = function() {
       var newCount;
-      newCount = Math.max(0, this.timerCount() - 10);
+      newCount = Math.max(0, this.timerCount() - 30);
       return this.timerCount(newCount);
     };
 
