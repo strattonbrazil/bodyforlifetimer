@@ -4,22 +4,35 @@
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   BodyForLifeTimerViewModel = (function() {
+    var TWENTY_MINUTES_IN_SECONDS, intervalIntensities;
+
+    TWENTY_MINUTES_IN_SECONDS = 1200;
 
     function BodyForLifeTimerViewModel() {
       this._tick = __bind(this._tick, this);
       this.timerGoing = ko.observable(false);
       this.startStopText = ko.computed(this._startStopText, this);
-      this.timerCount = ko.observable(1200);
+      this.startStopIcon = ko.computed(this._startStopIcon, this);
+      this.timerCount = ko.observable(TWENTY_MINUTES_IN_SECONDS);
       this.timerText = ko.computed(this._timerText, this);
       this.intensityText = ko.computed(this._intensityText, this);
+      this.intensityGraph = ko.computed(this._intensityGraph, this);
       this._secondIntervalHandle = setInterval(this._tick, 1000);
     }
 
     BodyForLifeTimerViewModel.prototype._startStopText = function() {
       if (this.timerGoing()) {
-        return 'Stop';
+        return ' Stop';
       } else {
-        return 'Start';
+        return ' Start';
+      }
+    };
+
+    BodyForLifeTimerViewModel.prototype._startStopIcon = function() {
+      if (this.timerGoing()) {
+        return 'fi-stop';
+      } else {
+        return 'fi-play';
       }
     };
 
@@ -42,12 +55,26 @@
 
     BodyForLifeTimerViewModel.prototype.timeToIntensity = function() {};
 
+    intervalIntensities = [5, 10, 9, 8, 7, 6, 9, 8, 7, 6, 9, 8, 7, 6, 9, 8, 7, 6, 5, 5];
+
+    BodyForLifeTimerViewModel.prototype._interval = function() {
+      return Math.floor(this.timerCount() / 60);
+    };
+
     BodyForLifeTimerViewModel.prototype._intensityText = function() {
-      var intensity, interval, intervalIntensities;
-      intervalIntensities = [5, 10, 9, 8, 7, 9, 8, 7, 9, 8, 7, 9, 8, 7, 9, 8, 7, 6, 5, 5];
-      interval = Math.floor(this.timerCount() / 60);
+      var intensity, interval;
+      interval = this._interval();
+      interval = Math.max(0, interval);
+      interval = Math.min(intervalIntensities.length - 1, interval);
       intensity = intervalIntensities[interval];
       return intensity;
+    };
+
+    BodyForLifeTimerViewModel.prototype._intensityGraph = function() {
+      var backwards;
+      backwards = intervalIntensities.slice(0);
+      backwards.reverse();
+      return backwards.join(' ');
     };
 
     BodyForLifeTimerViewModel.prototype._tick = function() {
@@ -60,11 +87,15 @@
     };
 
     BodyForLifeTimerViewModel.prototype.addTime = function() {
-      return this.timerCount(this.timerCount() + 10);
+      var newCount;
+      newCount = Math.min(TWENTY_MINUTES_IN_SECONDS, this.timerCount() + 10);
+      return this.timerCount(newCount);
     };
 
     BodyForLifeTimerViewModel.prototype.subtractTime = function() {
-      return this.timerCount(this.timerCount() - 10);
+      var newCount;
+      newCount = Math.max(0, this.timerCount() - 10);
+      return this.timerCount(newCount);
     };
 
     BodyForLifeTimerViewModel.prototype._playIntervalChangeSound = function() {};

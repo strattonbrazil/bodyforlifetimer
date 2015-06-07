@@ -1,18 +1,29 @@
 class BodyForLifeTimerViewModel
+    TWENTY_MINUTES_IN_SECONDS = 1200
+    
     constructor: ->
         @timerGoing = ko.observable(false)
         @startStopText = ko.computed(@_startStopText, @)
-        @timerCount = ko.observable(1200) # seconds left in workout
+        @startStopIcon = ko.computed(@_startStopIcon, @)
+        @timerCount = ko.observable(TWENTY_MINUTES_IN_SECONDS) # seconds left in workout
         @timerText = ko.computed(@_timerText, @)
         @intensityText = ko.computed(@_intensityText, @)
+        @intensityGraph = ko.computed(@_intensityGraph, @)
 
         @_secondIntervalHandle = setInterval(@_tick, 1000)
 
     _startStopText: ->
+        # NOTE: adding space character to space out icon and button text
         if @timerGoing()
-            return 'Stop'
+            return ' Stop'
         else
-            return 'Start'
+            return ' Start'
+
+    _startStopIcon: ->
+        if @timerGoing()
+            return 'fi-stop'
+        else
+            return 'fi-play'
 
     toggleTimer: (vm, event) ->
         going = @timerGoing()
@@ -34,34 +45,50 @@ class BodyForLifeTimerViewModel
     # given a time in seconds return the intensity
     timeToIntensity: ->
 
+
+    intervalIntensities = [
+        5 # last minute
+        10
+        9
+        8
+        7
+        6
+        9
+        8
+        7
+        6
+        9
+        8
+        7
+        6
+        9
+        8
+        7
+        6
+        5
+        5 # first minute
+    ]
+
+    # returns the current interval
+    _interval: ->
+        return Math.floor(@timerCount() / 60)
+
     _intensityText: ->
-        intervalIntensities = [
-            5 # last minute
-            10
-            9
-            8
-            7
-            9
-            8
-            7
-            9
-            8
-            7
-            9
-            8
-            7
-            9
-            8
-            7
-            6
-            5
-            5 # first minute
-        ]
+        interval = @_interval()
+
+        # make sure it fits in range
+        interval = Math.max(0, interval)
+        interval = Math.min(intervalIntensities.length-1, interval)
         
-        interval = Math.floor(@timerCount() / 60)
         intensity = intervalIntensities[interval]
         
         return intensity
+
+    _intensityGraph: ->
+        backwards = intervalIntensities.slice(0)
+        backwards.reverse()
+
+        return backwards.join(' ')
         
     # called every second
     _tick: =>
@@ -73,10 +100,12 @@ class BodyForLifeTimerViewModel
                 @_playIntervalChangeSound()
 
     addTime: ->
-        @timerCount(@timerCount()+10)
+        newCount = Math.min(TWENTY_MINUTES_IN_SECONDS, @timerCount() + 10)
+        @timerCount(newCount)
 
     subtractTime: ->
-        @timerCount(@timerCount()-10)
+        newCount = Math.max(0, @timerCount() - 10)
+        @timerCount(newCount)
 
     # play a sound when going between interval intensities
     _playIntervalChangeSound: ->

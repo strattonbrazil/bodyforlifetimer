@@ -4,18 +4,21 @@
   <meta charset="UTF-8">
   <title>Body for Life Timer</title>
   <link rel="stylesheet" type="text/css" href="./libs/foundation-essentials-5.5.2/css/foundation.css">
+  <link rel="stylesheet" type="text/css" href="./css/foundation-icons.css">
   <link rel="stylesheet" type="text/css" href="./css/main.css">
  </head>
  <body>
+   </div>
    <div class="row">
      <div class="large-12 text-center columns">
        <div class="timer-frame">
            <h1 class="header">Body for Life Timer</h1>
+           <div class="interval-hint" data-bind="text: intensityText">5</div>
            <div class="timer-text" data-bind="text: timerText">20:00</div>
-           <div class="interval-hint" data-bind="text: intensityText">High Intensity</div>
-           <a href="#" class="button control-button" data-bind="text: startStopText, click: toggleTimer">Start Timer</a>
-           <a href="#" class="button tiny control-button" data-bind="click: addTime">Add Time</a>
-           <a href="#" class="button tiny control-button" data-bind="click: subtractTime">Subtract Time</a>
+           <a href="#" class="button control-button" data-bind="css: startStopIcon, text: startStopText, click: toggleTimer"> Start</a>
+           <a href="#" class="button tiny control-button fi-plus" data-bind="click: addTime"> Add Time</a>
+           <a href="#" class="button tiny control-button fi-minus" data-bind="click: subtractTime"> Subtract Time</a>
+           <div data-bind="html: intensityGraph"></div>
            <div>
                <input type="checkbox">Sound Enabled</input>
            </div>
